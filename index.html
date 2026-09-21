@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>离线表单队列重放与冲突补偿</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div>
+        <p class="eyebrow">IndexedDB + Service Worker + BroadcastChannel</p>
+        <h1>离线表单提交 / 队列重放 / 冲突回滚</h1>
+        <p class="subtitle">多表单独立队列、多用户版本检测、字段级三方合并和可追踪补偿记录。</p>
+      </div>
+      <div class="status-card">
+        <label>当前用户
+          <select id="currentUser">
+            <option>用户 A</option>
+            <option>用户 B</option>
+            <option>用户 C</option>
+          </select>
+        </label>
+        <div class="network-row">
+          <span id="networkDot" class="dot online"></span>
+          <strong id="networkText">在线</strong>
+        </div>
+        <button id="toggleOffline" class="secondary" type="button">模拟离线</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="toolbar" aria-label="演示控制">
+        <div class="instruction">
+          <strong>验收路径</strong>
+          <span>模拟离线 → 编辑并提交 → 刷新页面 → 恢复在线 → 自动重放。也可在离线时让“其他用户”改同字段制造冲突。</span>
+        </div>
+        <label>全局异常注入
+          <select id="failureMode">
+            <option value="">不注入</option>
+            <option value="server-error">下一次 500（可重试）</option>
+            <option value="bad-request">下一次 400（永久失败并回滚）</option>
+          </select>
+        </label>
+        <button id="clearEvents" class="secondary" type="button">清空当前提示</button>
+      </section>
+
+      <section id="forms" class="forms-grid"></section>
+
+      <section class="panels">
+        <article class="panel">
+          <div class="panel-title">
+            <h2>离线队列</h2>
+            <span>按表单隔离，按创建时间重放</span>
+          </div>
+          <div id="queueList" class="list"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-title">
+            <h2>异常链路</h2>
+            <span>成功、重试、冲突、回滚均持久化</span>
+          </div>
+          <div id="eventList" class="list events"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-title">
+            <h2>补偿记录</h2>
+            <span>回滚前后快照可审计</span>
+          </div>
+          <div id="compensationList" class="list compensations"></div>
+        </article>
+      </section>
+    </main>
+
+    <div id="toastHost" class="toast-host" aria-live="polite"></div>
+    <script type="module" src="/src/app.js"></script>
+  </body>
+</html>

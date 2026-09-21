@@ -1,0 +1,10 @@
+{
+  "name": "offline-forms-queue",
+  "version": "1.0.0",
+  "description": "离线表单提交：IndexedDB 持久化队列 + Service Worker 故障注入 + BroadcastChannel 多标签同步，含冲突检测、回滚补偿与自动重放",
+  "private": true,
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/api.test.js && node test/client.test.js && node test/e2e.smoke.js"
+  }
+}

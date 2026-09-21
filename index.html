@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>离线表单 · 队列重放 / 冲突回滚</title>
+    <link rel="stylesheet" href="/css/app.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <h1>离线表单工作台</h1>
+        <div class="top-controls">
+          <label class="control">
+            <span class="dot" id="net-dot"></span>
+            <span id="net-text">检测中…</span>
+          </label>
+          <label class="switch">
+            <input type="checkbox" id="offline-toggle" />
+            <span>模拟断网</span>
+          </label>
+          <label class="control">
+            当前用户
+            <select id="user-select"></select>
+          </label>
+          <span class="leader" id="leader-text"></span>
+          <span class="summary" id="queue-summary"></span>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <div id="forms" class="forms-grid"></div>
+
+      <section class="card queue-card">
+        <header class="card-head">
+          <div>
+            <h2>离线提交队列（IndexedDB 持久化）</h2>
+            <p class="desc">按表单分链、FIFO 重放；冲突只阻塞对应表单，其他表单照常同步</p>
+          </div>
+          <div class="card-side queue-tools">
+            <label class="control">
+              注入他人修改
+              <select id="inject-entity"></select>
+            </label>
+            <button class="btn" id="inject-btn">制造冲突</button>
+            <button class="btn btn-ghost" id="reset-btn">重置演示</button>
+          </div>
+        </header>
+        <div id="queue-body" class="queue-body"></div>
+      </section>
+
+      <section class="card help-card">
+        <h2>验收操作指引</h2>
+        <ol>
+          <li>打开「模拟断网」，在任意表单提交 —— 提示离线已保存；<b>刷新页面后队列仍在</b>。</li>
+          <li>关闭「模拟断网」—— 队列自动重放，Toast 提示同步成功，版本号前进。</li>
+          <li>断网提交后，点「制造冲突」让服务器版本前进，再恢复网络 —— 弹出冲突，该表单队列暂停。</li>
+          <li>选择「回滚」：本地提交撤销，表单回到服务器数据；「重试」：尝试字段级自动合并；「强制覆盖」：以本地版本补偿写入。</li>
+          <li>在表单 1 和表单 2 分别排队，令其中一个冲突 —— 另一个不受影响、照常同步。</li>
+          <li>多开标签页可观察：仅一个标签页是重放 Leader，所有标签页通过 BroadcastChannel 实时同步 UI。</li>
+        </ol>
+      </section>
+    </main>
+
+    <div id="toasts" class="toasts"></div>
+
+    <script src="/js/idb.js"></script>
+    <script src="/js/bus.js"></script>
+    <script src="/js/store.js"></script>
+    <script src="/js/engine.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>
